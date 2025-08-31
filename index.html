@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Heartfelt Apology</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body {
+      background: linear-gradient(135deg, #ffdde1 0%, #ee9ca7 100%);
+      min-height:100vh; display:flex; justify-content:center; align-items:center;
+      overflow:hidden; color:#333; position:relative;
+    }
+    .container {
+      width:90%; max-width:800px; height:80vh;
+      background-color:rgba(255,255,255,0.9);
+      border-radius:20px; box-shadow:0 15px 40px rgba(255,105,180,0.3);
+      padding:30px; position:relative; display:flex; flex-direction:column;
+      backdrop-filter:blur(12px); z-index:10;
+      opacity:0; animation:fadeIn 1.5s ease forwards;
+    }
+    @keyframes fadeIn { to{opacity:1;} }
+
+    /* Onboarding */
+    .onboarding {
+      display:flex; flex-direction:column; justify-content:center; align-items:center;
+      height:100%; text-align:center; gap:25px;
+      animation: floatIn 2s ease;
+    }
+    @keyframes floatIn {
+      0% { transform:translateY(30px); opacity:0; }
+      100% { transform:translateY(0); opacity:1; }
+    }
+    .onboarding h1 {
+      font-size:2.5rem; color:#ff4b91; font-weight:700;
+      text-shadow: 0 0 8px rgba(255,75,145,0.5);
+    }
+    .onboarding p { font-size:1.3rem; color:#444; }
+
+    .start-btn, .music-btn {
+      background: linear-gradient(135deg, #ff4b91, #ff9068);
+      color:white; border:none;
+      padding:14px 35px; font-size:1.2rem; border-radius:50px; cursor:pointer;
+      transition:all .3s ease; box-shadow:0 6px 20px rgba(255,75,145,0.4);
+    }
+    .start-btn:hover, .music-btn:hover {
+      transform:scale(1.1);
+      box-shadow:0 8px 25px rgba(255,75,145,0.6);
+    }
+
+    /* Apology section */
+    .apology-section { display:none; flex-direction:column; height:100%; }
+    .emoji-container {
+      flex:1;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+    }
+    .sorry-emoji {
+      font-size:6rem;
+      animation:pulseEmoji 2s infinite;
+    }
+    @keyframes pulseEmoji {
+      0% { transform:scale(1); opacity:0.8; }
+      50% { transform:scale(1.3); opacity:1; }
+      100% { transform:scale(1); opacity:0.8; }
+    }
+
+    .apology-board {
+      background: linear-gradient(135deg, #ff4b91, #ff758c);
+      color:white; padding:15px;
+      border-radius:12px; text-align:center; font-size:1.3rem; font-weight:600;
+      margin-top:20px; box-shadow:0 -5px 20px rgba(255,75,145,0.3);
+    }
+    .buttons-container { display:flex; justify-content:center; gap:20px; margin-top:20px; flex-wrap:wrap; }
+    .response-btn {
+      padding:12px 25px; border:none; border-radius:50px; font-size:1rem; cursor:pointer;
+      transition:all .3s ease; font-weight:600;
+    }
+    .forgive-btn { background-color:#48bb78; color:white; }
+    .angry-btn { background-color:#f56565; color:white; }
+    .response-btn:hover { transform:translateY(-2px) scale(1.05); box-shadow:0 4px 12px rgba(0,0,0,0.2); }
+    .forgive-btn:hover { background-color:#38a169; }
+    .angry-btn:hover { background-color:#e53e3e; }
+
+    /* Back button */
+    .back-btn {
+      margin-top:20px;
+      background:#718096;
+      color:white; border:none;
+      padding:10px 25px; border-radius:50px; font-size:1rem;
+      cursor:pointer; transition:all .3s ease; font-weight:600;
+    }
+    .back-btn:hover { background:#4a5568; transform:scale(1.05); }
+
+    .music-icon {
+      position:absolute; top:20px; right:20px; font-size:1.5rem; color:#ff4b91;
+      opacity:0.8; animation:pulse 2s infinite; cursor:pointer;
+    }
+    @keyframes pulse { 0%{opacity:.7; transform:scale(1);} 50%{opacity:1; transform:scale(1.2);} 100%{opacity:.7; transform:scale(1);} }
+
+    /* Falling elements */
+    .floating-container {
+      position:absolute; top:0; left:0; width:100%; height:100%; z-index:5;
+      pointer-events:none; overflow:hidden;
+    }
+    .fall {
+      position:absolute; top:-5vh;
+      animation:fallAnim linear forwards;
+      opacity:0;
+    }
+    @keyframes fallAnim {
+      0% { transform:translateY(-10vh); opacity:0; }
+      10% { opacity:1; }
+      100% { transform:translateY(110vh) rotate(360deg); opacity:0; }
+    }
+
+    /* Message overlays */
+    .message-overlay {
+      position:fixed; top:0; left:0; width:100%; height:100%;
+      background-color:rgba(0,0,0,0.7); display:flex; justify-content:center; align-items:center;
+      z-index:1000; opacity:0; pointer-events:none; transition:opacity .3s ease;
+    }
+    .message-overlay.active { opacity:1; pointer-events:all; }
+    .message-box {
+      background:white; padding:30px; border-radius:15px; max-width:500px; text-align:center;
+      box-shadow:0 10px 30px rgba(0,0,0,0.3); transform:scale(0.8); transition:transform .3s ease;
+    }
+    .message-overlay.active .message-box { transform:scale(1); }
+    .message-box h2 { color:#ff4b91; margin-bottom:15px; font-size:1.8rem; }
+    .message-box p { color:#4a5568; line-height:1.6; margin-bottom:20px; font-size:1.1rem; }
+    .close-btn {
+      background:#ff4b91; color:white; border:none; padding:10px 20px; border-radius:50px;
+      cursor:pointer; font-weight:600;
+    }
+    .close-btn:hover { background:#ff1e56; }
+  </style>
+</head>
+<body>
+  <!-- Falling Flowers & Hearts -->
+  <div class="floating-container" id="floatingContainer"></div>
+
+  <div class="container">
+    <div class="music-icon" id="musicIcon" title="Play/Pause music">🎵</div>
+
+    <!-- Onboarding -->
+    <div class="onboarding" id="onboarding">
+      <h1>Hey Beautiful 💖</h1>
+      <p>I want to make things right... Please listen to this and feel my heart.</p>
+      <button class="music-btn" id="musicBtn">Please listen to this 🎶</button>
+      <button class="start-btn" id="startApology">Start Apology 💌</button>
+    </div>
+
+    <!-- Apology Section -->
+    <div class="apology-section" id="apologySection">
+      <div class="emoji-container">
+        <div class="sorry-emoji">🙏😔💔</div>
+      </div>
+      <div class="apology-board">माझं खूप खूप माफी मागतो, कृपया माफ करा.</div>
+      <div class="buttons-container">
+        <button class="response-btn forgive-btn" id="forgiveBtn">Yes, I forgive you! ❤️</button>
+        <button class="response-btn angry-btn" id="angryBtn">No, I'm still angry 😠</button>
+      </div>
+      <!-- Back button -->
+      <button class="back-btn" id="backBtn">⬅ Back</button>
+    </div>
+
+    <!-- Audio -->
+    <audio id="apologyAudio" loop>
+      <source src="audiomass-output.mp3" type="audio/mpeg">
+    </audio>
+  </div>
+
+  <!-- Messages -->
+  <div class="message-overlay" id="forgiveMessage">
+    <div class="message-box">
+      <h2>Thank You! ❤️</h2>
+      <p>I sincerely apologize for my mistake. I admit that I got influenced by somebody else and made a wrong choice. I deeply regret it and I take full responsibility.</p>
+      <button class="close-btn" id="closeForgive">Close</button>
+    </div>
+  </div>
+  <div class="message-overlay" id="angryMessage">
+    <div class="message-box">
+      <h2>I Understand 💔</h2>
+      <p>I completely understand that you're still hurt. I also want you to know that I made a mistake because I got carried away under someone’s influence, and I regret it deeply.</p>
+      <button class="close-btn" id="closeAngry">Close</button>
+    </div>
+  </div>
+
+<script>
+const onboarding=document.getElementById('onboarding');
+const apologySection=document.getElementById('apologySection');
+const startApologyBtn=document.getElementById('startApology');
+const musicBtn=document.getElementById('musicBtn');
+const musicIcon=document.getElementById('musicIcon');
+const forgiveBtn=document.getElementById('forgiveBtn');
+const angryBtn=document.getElementById('angryBtn');
+const apologyAudio=document.getElementById('apologyAudio');
+const floatingContainer=document.getElementById('floatingContainer');
+const forgiveMessage=document.getElementById('forgiveMessage');
+const angryMessage=document.getElementById('angryMessage');
+const closeForgive=document.getElementById('closeForgive');
+const closeAngry=document.getElementById('closeAngry');
+const backBtn=document.getElementById('backBtn');
+
+let isPlaying=false, fallInterval=null;
+
+// Falling flowers & hearts
+function startFalling(){
+  if(fallInterval) clearInterval(fallInterval);
+  fallInterval=setInterval(()=>{
+    if(!isPlaying){ clearInterval(fallInterval); return; }
+    const el=document.createElement('div');
+    el.className='fall';
+    el.innerHTML=Math.random()>0.5?'🌸':'❤️';
+    el.style.left=Math.random()*100+'vw';
+    el.style.fontSize=(20+Math.random()*30)+'px';
+    el.style.animationDuration=(5+Math.random()*5)+'s';
+    floatingContainer.appendChild(el);
+    setTimeout(()=>{if(el.parentNode) el.remove();},10000);
+  },400);
+}
+
+// Play audio safely
+function playMusic(){
+  apologyAudio.volume=0.5;
+  apologyAudio.play().then(()=>{
+    isPlaying=true; musicIcon.textContent="🔊";
+    musicBtn.textContent="Music is playing 🎶";
+    startFalling();
+  }).catch(()=>alert("Click again to enable audio (browser blocked autoplay)."));
+}
+
+// Buttons
+startApologyBtn.addEventListener('click',()=>{
+  onboarding.style.display='none';apologySection.style.display='flex';
+});
+backBtn.addEventListener('click',()=>{
+  apologySection.style.display='none';onboarding.style.display='flex';
+});
+musicBtn.addEventListener('click',playMusic);
+musicIcon.addEventListener('click',()=>{
+  if(isPlaying){apologyAudio.pause();isPlaying=false;musicIcon.textContent="🔇";}
+  else{playMusic();}
+});
+forgiveBtn.addEventListener('click',()=>forgiveMessage.classList.add('active'));
+angryBtn.addEventListener('click',()=>angryMessage.classList.add('active'));
+closeForgive.addEventListener('click',()=>forgiveMessage.classList.remove('active'));
+closeAngry.addEventListener('click',()=>angryMessage.classList.remove('active'));
+</script>
+</body>
+</html>
